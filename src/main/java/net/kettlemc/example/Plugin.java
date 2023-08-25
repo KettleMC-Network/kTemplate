@@ -5,7 +5,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public final class Plugin extends JavaPlugin {
 
-    private final ContentManager contentManager = ContentManager.instance();
+    private final ContentManager contentManager = new ContentManager(this);
 
     @Override
     public void onEnable() {

@@ -8,16 +8,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public final class ContentManager {
 
-    private static ContentManager instance;
-    private static JavaPlugin plugin;
+    private final JavaPlugin plugin;
 
-    private ContentManager() {
-        instance = this;
-        plugin = JavaPlugin.getPlugin(Plugin.class);
-    }
-
-    public static ContentManager instance() {
-        return instance;
+    public ContentManager(JavaPlugin plugin) {
+        this.plugin = plugin;
     }
 
     public void registerCommand(String name, CommandExecutor executor) {
