@@ -1,7 +1,6 @@
 package net.kettlemc.example.config;
 
 import io.github.almightysatan.jaskl.Config;
-import io.github.almightysatan.jaskl.annotation.AnnotationManager;
 import io.github.almightysatan.jaskl.entries.StringConfigEntry;
 import io.github.almightysatan.jaskl.hocon.HoconConfig;
 
