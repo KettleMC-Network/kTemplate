@@ -23,6 +23,17 @@ java {
     withJavadocJar()
 }
 
+configurations {
+    internal
+    implementation.extendsFrom(internal)
+}
+
+jar {
+    from {
+        configurations.internal.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
 compileJava { options.encoding = "UTF-8" }
 javadoc { options.encoding = "UTF-8" }
 
@@ -64,8 +75,14 @@ if (spigotVersion) {
 }
 
 if (jasklVersion && jasklImplementation) {
-    dependencies {
-        implementation "io.github.almighty-satan.jaskl:jaskl-${jasklImplementation}:${jasklVersion}"
+    if (jasklShadow) {
+        dependencies {
+            internal "io.github.almighty-satan.jaskl:jaskl-${jasklImplementation}:${jasklVersion}"
+        }
+    } else {
+        dependencies {
+            implementation "io.github.almighty-satan.jaskl:jaskl-${jasklImplementation}:${jasklVersion}"
+        }
     }
 }
 
@@ -84,16 +101,7 @@ processResources {
             "main": pluginMain
     )
 }
-configurations {
-    internal
-    implementation.extendsFrom(internal)
-}
 
-jar {
-    from {
-        configurations.internal.collect { it.isDirectory() ? it : zipTree(it) }
-    }
-}
 
 static JavaVersion getVersionForMajor(String major) {
     int version = Integer.parseInt(major)

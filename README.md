@@ -1,4 +1,4 @@
-# ☕ Spigot Plugin Template
+# ☕ kTemplate
 
 ## 📝 Description
 A template for creating a spigot, paper or paper-legacy plugin.
@@ -39,8 +39,10 @@ paperLegacyVersion =
 # JASKL settings (https://github.com/Almighty-Satan/JASKL)
 # If you want to use JASKL, insert the version and implementation here.
 # If you don't want to use JASKL, leave at least one of the options empty.
+# If JASKL should be shadowed into the JAR file, enable jasklShadow.
 jasklVersion = 1.4.0
 jasklImplementation = hocon
+jasklShadow = false
 
 # Gradle settings
 projectGroup = net.kettlemc
