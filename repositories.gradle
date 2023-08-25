@@ -1,0 +1,3 @@
+repositories {
+    // Add your repositories here, no need to add mavenCentral, Sonatype, SpigotMC, or PaperMC as they are already included
+}

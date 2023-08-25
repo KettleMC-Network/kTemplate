@@ -1,0 +1,102 @@
+// You should not need to edit this file directly.
+// Use repositories.gradle and dependencies.gradle instead.
+
+plugins {
+    id "java"
+}
+
+// Use repositories from "repositories.gradle"
+if (file("repositories.gradle").exists()) {
+    apply from: "repositories.gradle"
+}
+// Use dependencies from "dependencies.gradle"
+if (file("dependencies.gradle").exists()) {
+    apply from: "dependencies.gradle"
+}
+
+
+java {
+    sourceCompatibility = getVersionForMajor(javaSourceVersion)
+    targetCompatibility = getVersionForMajor(javaTargetVersion)
+
+    withSourcesJar()
+    withJavadocJar()
+}
+
+compileJava { options.encoding = "UTF-8" }
+javadoc { options.encoding = "UTF-8" }
+
+repositories {
+    mavenCentral()
+    maven {
+        name = "papermc-legacy"
+        url = "https://papermc.io/repo/repository/maven-public/"
+    }
+    maven {
+        name = "papermc"
+        url = "https://repo.papermc.io/repository/maven-public/"
+    }
+    maven {
+        name = "spigotmc"
+        url = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/"
+    }
+    maven {
+        name = "sonatype-bungeecord"
+        url = "https://oss.sonatype.org/content/repositories/snapshots"
+    }
+}
+
+group projectGroup
+version pluginVersion
+
+if (spigotVersion) {
+    dependencies {
+        implementation "org.spigotmc:spigot-api:${spigotVersion}"
+    }
+} else if (paperVersion) {
+    dependencies {
+        implementation "io.papermc.paper:paper-api:${paperVersion}"
+    }
+} else if (paperLegacyVersion) {
+    dependencies {
+        implementation "com.destroystokyo.paper:paper-api:${paperLegacyVersion}"
+    }
+}
+
+if (jasklVersion && jasklImplementation) {
+    dependencies {
+        implementation "io.github.almighty-satan.jaskl:jaskl-${jasklImplementation}:${jasklVersion}"
+    }
+}
+
+processResources {
+    outputs.upToDateWhen { false }
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    from sourceSets.main.resources.srcDirs
+    include "**/plugin.yml"
+    expand(
+            "name": pluginName,
+            "version": pluginVersion,
+            "author": pluginAuthor,
+            "description": pluginDescription,
+            "website": pluginWebsite,
+            "apiversion": pluginApiVersion,
+            "main": pluginMain
+    )
+}
+configurations {
+    internal
+    implementation.extendsFrom(internal)
+}
+
+jar {
+    from {
+        configurations.internal.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+static JavaVersion getVersionForMajor(String major) {
+    int version = Integer.parseInt(major)
+    JavaVersion[] javaVersions = JavaVersion.values()
+    return version >= javaVersions.size() ? JavaVersion.VERSION_HIGHER : javaVersions[version - 1]
+}

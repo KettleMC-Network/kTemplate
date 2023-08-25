@@ -1,0 +1,3 @@
+dependencies {
+    // Add your dependencies here, no need to add spigot or paper as they can be added using the gradle.properties
+}
