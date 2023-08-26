@@ -9,6 +9,7 @@ plugins {
 if (file("repositories.gradle").exists()) {
     apply from: "repositories.gradle"
 }
+
 // Use dependencies from "dependencies.gradle"
 if (file("dependencies.gradle").exists()) {
     apply from: "dependencies.gradle"
@@ -19,8 +20,12 @@ java {
     sourceCompatibility = getVersionForMajor(javaSourceVersion)
     targetCompatibility = getVersionForMajor(javaTargetVersion)
 
-    withSourcesJar()
-    withJavadocJar()
+    if (generateSourcesJar) {
+        withSourcesJar()
+    }
+    if (generateJavadocJar) {
+        withJavadocJar()
+    }
 }
 
 configurations {
@@ -124,9 +129,6 @@ processResources {
     )
 }
 
-
-static JavaVersion getVersionForMajor(String major) {
-    int version = Integer.parseInt(major)
-    JavaVersion[] javaVersions = JavaVersion.values()
-    return version >= javaVersions.size() ? JavaVersion.VERSION_HIGHER : javaVersions[version - 1]
+static JavaVersion getVersionForMajor(String version) {
+    return JavaVersion.values().find { (it.majorVersion == version) }
 }
