@@ -32,9 +32,13 @@ pluginApiVersion = 1.13
 # Spigot: 1.8 - 1.20.1
 # Paper: 1.17 - 1.20.1
 # Paper Legacy: 1.9.4 - 1.16.5
+# Velocity: 1.0.0 - 4.0.0
+# BungeeCord: 1.4.7 - 1.20
 spigotVersion = 1.8.8-R0.1-SNAPSHOT
 paperVersion =
 paperLegacyVersion =
+velocityVersion =
+bungeeVersion =
 
 # JASKL settings (https://github.com/Almighty-Satan/JASKL)
 # If you want to use JASKL, insert the version and implementation here.
@@ -48,6 +52,8 @@ jasklShadow = false
 projectGroup = net.kettlemc
 javaSourceVersion = 8
 javaTargetVersion = 8
+generateSourcesJar = true
+generateJavadocJar = true
 # org.gradle.java.home=C:/Program Files/Eclipse Adoptium/jdk-17.0.2.8-hotspot
 ```
 
