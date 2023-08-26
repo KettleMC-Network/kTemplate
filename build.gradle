@@ -74,6 +74,11 @@ if (spigotVersion) {
     }
 }
 
+dependencies {
+    implementation fileTree(dir: 'libs/implementation', include: '*.jar')
+    internal fileTree(dir: 'libs/internal', include: '*.jar')
+}
+
 if (jasklVersion && jasklImplementation) {
     if (jasklShadow) {
         dependencies {
