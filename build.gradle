@@ -55,6 +55,10 @@ repositories {
         name = "sonatype-bungeecord"
         url = "https://oss.sonatype.org/content/repositories/snapshots"
     }
+    maven {
+        name 'velocity'
+        url 'https://nexus.velocitypowered.com/repository/maven-public/'
+    }
 }
 
 group projectGroup
@@ -64,13 +68,26 @@ if (spigotVersion) {
     dependencies {
         implementation "org.spigotmc:spigot-api:${spigotVersion}"
     }
-} else if (paperVersion) {
+}
+if (paperVersion) {
     dependencies {
         implementation "io.papermc.paper:paper-api:${paperVersion}"
     }
-} else if (paperLegacyVersion) {
+}
+if (paperLegacyVersion) {
     dependencies {
         implementation "com.destroystokyo.paper:paper-api:${paperLegacyVersion}"
+    }
+}
+if (velocityVersion) {
+    dependencies {
+        implementation "com.velocitypowered:velocity-api:${velocityVersion}"
+        annotationProcessor "com.velocitypowered:velocity-api:${velocityVersion}"
+    }
+}
+if (bungeeVersion) {
+    dependencies {
+        implementation "net.md-5:bungeecord-api:${bungeeVersion}"
     }
 }
 
