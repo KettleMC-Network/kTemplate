@@ -8,14 +8,14 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class PluginConfig {
+public class Configuration {
 
-    private static final Path CONFIG_PATH = Paths.get("plugins", "Plugin", "config.conf");
-    private static final Config CONFIG = HoconConfig.of(CONFIG_PATH.toFile(), "Config for example values");
+    public static final Path CONFIG_DIRECTORY = Paths.get("plugins", "Plugin");
+    private static final Config CONFIG = HoconConfig.of(CONFIG_DIRECTORY.resolve("config.conf").toFile(), "Config for example values");
 
-    public static final StringConfigEntry PREFIX = StringConfigEntry.of(CONFIG, "messages.prefix", "The prefix to use.", "[Prefix] ");
+    public static final StringConfigEntry PERMISSION_LAYOUT = StringConfigEntry.of(CONFIG, "settings.permission-prefix", "The default permission layout", "system.%s");
 
-    private PluginConfig() {
+    private Configuration() {
     }
 
     public static boolean load() {

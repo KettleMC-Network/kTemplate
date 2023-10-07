@@ -51,8 +51,16 @@ repositories {
         url = "https://oss.sonatype.org/content/repositories/snapshots"
     }
     maven {
-        name 'velocity'
-        url 'https://nexus.velocitypowered.com/repository/maven-public/'
+        name "velocity"
+        url "https://nexus.velocitypowered.com/repository/maven-public/"
+    }
+    maven {
+        name = "sonatype-almighty-satan"
+        url = "https://s01.oss.sonatype.org/content/repositories/iogithubalmighty-satan-1010"
+    }
+    maven {
+        name = "kettlemc"
+        url = "https://repo.kettlemc.net/repository/maven-public/"
     }
 }
 
@@ -87,8 +95,9 @@ if (bungeeVersion) {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs/implementation', include: '*.jar')
-    internal fileTree(dir: 'libs/internal', include: '*.jar')
+    implementation fileTree(dir: "libs/implementation", include: "*.jar")
+    internal fileTree(dir: "libs/internal", include: "*.jar")
+    compileOnly "org.jetbrains:annotations:24.0.1"
 }
 
 if (jasklVersion && jasklImplementation) {
@@ -100,6 +109,27 @@ if (jasklVersion && jasklImplementation) {
         dependencies {
             implementation "io.github.almighty-satan.jaskl:jaskl-${jasklImplementation}:${jasklVersion}"
         }
+    }
+}
+
+if (slamsVersion && (slamsParser || slamsImplementation) ) {
+    if (slamsShadow) {
+        dependencies {
+            internal "io.github.almighty-satan.slams:slams-parser-${slamsParser}:${slamsVersion}"
+            internal "io.github.almighty-satan.slams:slams-${slamsImplementation}:${slamsVersion}"
+        }
+    } else {
+        dependencies {
+            implementation "io.github.almighty-satan.slams:slams-parser-${slamsParser}:${slamsVersion}"
+            implementation "io.github.almighty-satan.slams:slams-${slamsImplementation}:${slamsVersion}"
+        }
+    }
+}
+
+if (klanguageVersion) {
+    dependencies {
+        implementation "net.kettlemc.klanguage:klanguage-core:${klanguageVersion}"
+        implementation "net.kettlemc.klanguage:klanguage-${klanguageImplementation}:${klanguageVersion}"
     }
 }
 
