@@ -5,16 +5,6 @@ plugins {
     id "java"
 }
 
-// Use repositories from "repositories.gradle"
-if (file("repositories.gradle").exists()) {
-    apply from: "repositories.gradle"
-}
-
-// Use dependencies from "dependencies.gradle"
-if (file("dependencies.gradle").exists()) {
-    apply from: "dependencies.gradle"
-}
-
 
 java {
     sourceCompatibility = getVersionForMajor(javaSourceVersion)
@@ -111,6 +101,16 @@ if (jasklVersion && jasklImplementation) {
             implementation "io.github.almighty-satan.jaskl:jaskl-${jasklImplementation}:${jasklVersion}"
         }
     }
+}
+
+// Use repositories from "repositories.gradle"
+if (file("repositories.gradle").exists()) {
+    apply from: "repositories.gradle"
+}
+
+// Use dependencies from "dependencies.gradle"
+if (file("dependencies.gradle").exists()) {
+    apply from: "dependencies.gradle"
 }
 
 processResources {
