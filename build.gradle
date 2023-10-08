@@ -27,6 +27,7 @@ jar {
     from {
         configurations.internal.collect { it.isDirectory() ? it : zipTree(it) }
     }
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 
 compileJava { options.encoding = "UTF-8" }
@@ -130,6 +131,12 @@ if (klanguageVersion) {
     dependencies {
         implementation "net.kettlemc.klanguage:klanguage-core:${klanguageVersion}"
         implementation "net.kettlemc.klanguage:klanguage-${klanguageImplementation}:${klanguageVersion}"
+    }
+}
+
+if (kcommonVersion) {
+    dependencies {
+        implementation "net.kettlemc.kcommon:kcommon:${kcommonVersion}"
     }
 }
 
