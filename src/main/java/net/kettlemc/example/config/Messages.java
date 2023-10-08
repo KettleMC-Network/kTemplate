@@ -15,7 +15,7 @@ public class Messages {
 
     private static final String DEFAULT_LANGUAGE = "de";
 
-    private static final Path LANGUAGE_PATH = Paths.get("plugins", "kLanguage", "languages");
+    private static final Path LANGUAGE_PATH = Paths.get("plugins", "Plugin", "languages");
     private static final Slams LANGUAGE_MANAGER = Slams.create(DEFAULT_LANGUAGE);
 
     public static final AdventureMessage PREFIX = AdventureMessage.of("prefix", LANGUAGE_MANAGER);
