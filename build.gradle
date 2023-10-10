@@ -3,6 +3,7 @@
 
 plugins {
     id "java"
+    id "com.github.johnrengelman.shadow" version "7.0.0"
 }
 
 
@@ -102,7 +103,7 @@ dependencies {
 }
 
 if (jasklVersion && jasklImplementation) {
-    if (jasklShadow) {
+    if (jasklShadow == "true") {
         dependencies {
             internal "io.github.almighty-satan.jaskl:jaskl-${jasklImplementation}:${jasklVersion}"
         }
@@ -114,7 +115,7 @@ if (jasklVersion && jasklImplementation) {
 }
 
 if (slamsVersion && (slamsParser || slamsImplementation) ) {
-    if (slamsShadow) {
+    if (slamsShadow == "true") {
         dependencies {
             internal "io.github.almighty-satan.slams:slams-parser-${slamsParser}:${slamsVersion}"
             internal "io.github.almighty-satan.slams:slams-${slamsImplementation}:${slamsVersion}"
@@ -138,7 +139,7 @@ if (klanguageVersion) {
 
 if (kcommonVersion) {
     dependencies {
-        implementation "net.kettlemc.kcommon:kcommon:${kcommonVersion}"
+        implementation "net.kettlemc:kcommon:${kcommonVersion}"
     }
 }
 
@@ -156,7 +157,7 @@ processResources {
     outputs.upToDateWhen { false }
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
     from sourceSets.main.resources.srcDirs
-    include "**/plugin.yml"
+    include "**/*.*"
     expand(
             "name": pluginName,
             "version": pluginVersion,
@@ -170,4 +171,30 @@ processResources {
 
 static JavaVersion getVersionForMajor(String version) {
     return JavaVersion.values().find { (it.majorVersion == version) }
+}
+
+if (libby == "true") {
+
+    repositories {
+        maven {
+            name = "AlessioDP"
+            url = "https://repo.alessiodp.com/snapshots/"
+        }
+    }
+
+    dependencies {
+        implementation "com.alessiodp.libby:libby-bukkit:2.0.0-SNAPSHOT"
+    }
+
+    shadowJar {
+        // Add dependencies you want to relocate here if needed
+        // For example, to relocate Guava:
+        dependencies {
+            include dependency("com.alessiodp.libby:libby-bukkit:2.0.0-SNAPSHOT")
+            include dependency("com.alessiodp.libby:libby-core:2.0.0-SNAPSHOT")
+        }
+
+        // Configure relocations
+        relocate 'com.alessiodp.libby', "net.kettlemc.${pluginName}.libs.com.alessiodp.libby"
+    }
 }
