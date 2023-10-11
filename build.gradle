@@ -58,7 +58,7 @@ repositories {
     }
     maven {
         name = "sonatype-almighty-satan"
-        url = "https://s01.oss.sonatype.org/content/repositories/iogithubalmighty-satan-1010"
+        url = "https://s01.oss.sonatype.org/content/repositories/iogithubalmighty-satan-1012"
     }
     maven {
         name = "kettlemc"
@@ -188,7 +188,6 @@ if (libby == "true") {
 
     shadowJar {
         // Add dependencies you want to relocate here if needed
-        // For example, to relocate Guava:
         dependencies {
             include dependency("com.alessiodp.libby:libby-bukkit:2.0.0-SNAPSHOT")
             include dependency("com.alessiodp.libby:libby-core:2.0.0-SNAPSHOT")
