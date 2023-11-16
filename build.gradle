@@ -57,10 +57,6 @@ repositories {
         url "https://nexus.velocitypowered.com/repository/maven-public/"
     }
     maven {
-        name = "sonatype-almighty-satan"
-        url = "https://s01.oss.sonatype.org/content/repositories/iogithubalmighty-satan-1012"
-    }
-    maven {
         name = "kettlemc"
         url = "https://repo.kettlemc.net/repository/maven-public/"
     }
