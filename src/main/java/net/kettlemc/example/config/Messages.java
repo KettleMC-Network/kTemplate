@@ -3,6 +3,7 @@ package net.kettlemc.example.config;
 import io.github.almightysatan.slams.Slams;
 import io.github.almightysatan.slams.minimessage.AdventureMessage;
 import io.github.almightysatan.slams.parser.JacksonParser;
+import net.kettlemc.kcommon.java.FileUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -31,6 +32,10 @@ public class Messages {
     public static boolean load() {
         if (!LANGUAGE_PATH.toFile().exists())
             LANGUAGE_PATH.toFile().mkdirs();
+
+        FileUtil.saveResourceAsFile(Messages.class, "lang/de.json", LANGUAGE_PATH.resolve("de.json"));
+        FileUtil.saveResourceAsFile(Messages.class, "lang/en.json", LANGUAGE_PATH.resolve("en.json"));
+
         try {
             loadFromFilesInDirectory(LANGUAGE_PATH.toFile());
             return true;
