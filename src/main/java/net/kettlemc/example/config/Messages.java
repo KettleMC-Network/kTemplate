@@ -55,7 +55,7 @@ public class Messages {
         for (File file : Objects.requireNonNull(LANGUAGE_PATH.toFile().listFiles())) {
             if (file.isDirectory()) loadFromFilesInDirectory(file);
             else if (file.getName().endsWith(".json"))
-                LANGUAGE_MANAGER.load(DEFAULT_LANGUAGE, JacksonParser.createJsonParser(file));
+                LANGUAGE_MANAGER.load(file.getName().substring(0, file.getName().length() - 5), JacksonParser.createJsonParser(file));
         }
     }
 
