@@ -1,105 +1,123 @@
 // You should not need to edit this file directly.
 // Use repositories.gradle and dependencies.gradle instead.
 
+import groovy.json.JsonSlurper
+
 plugins {
     id "java"
     id "com.github.johnrengelman.shadow" version "7.0.0"
 }
 
+configurations {
+    internal
+}
+
+configurations.implementation.extendsFrom(configurations.internal)
 
 java {
     sourceCompatibility = getVersionForMajor(javaSourceVersion)
     targetCompatibility = getVersionForMajor(javaTargetVersion)
 
-    if (generateSourcesJar) {
+    if (generateSourcesJar.toBoolean()) {
         withSourcesJar()
     }
-    if (generateJavadocJar) {
+    if (generateJavadocJar.toBoolean()) {
         withJavadocJar()
     }
 }
 
-configurations {
-    internal
-    implementation.extendsFrom(internal)
-}
+// Configure shadowJar task
+shadowJar {
+    configurations = [project.configurations.internal]
 
-jar {
-    from {
-        configurations.internal.collect { it.isDirectory() ? it : zipTree(it) }
+    dependencies {
+        include { dep -> project.configurations.internal.dependencies.contains(dep) }
     }
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+
+    project.configurations.internal.dependencies.each { dep ->
+        if (dep.group && dep.name) {
+            relocate "${dep.group}.${dep.name.replace('-', '.')}",
+                    "net.kettlemc.${pluginName}.libs.${dep.group.replace('.', '_')}.${dep.name.replace('-', '_')}"
+        }
+    }
 }
 
-compileJava { options.encoding = "UTF-8" }
-javadoc { options.encoding = "UTF-8" }
+tasks.compileJava {
+    options.encoding = "UTF-8"
+}
+
+tasks.javadoc {
+    options.encoding = "UTF-8"
+}
 
 repositories {
     mavenCentral()
-    maven {
-        name = "papermc-legacy"
-        url = "https://papermc.io/repo/repository/maven-public/"
-    }
-    maven {
-        name = "papermc"
-        url = "https://repo.papermc.io/repository/maven-public/"
-    }
-    maven {
-        name = "spigotmc"
-        url = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/"
-    }
-    maven {
-        name = "sonatype-bungeecord"
-        url = "https://oss.sonatype.org/content/repositories/snapshots"
-    }
-    maven {
-        name "velocity"
-        url "https://nexus.velocitypowered.com/repository/maven-public/"
-    }
     maven {
         name = "kettlemc"
         url = "https://repo.kettlemc.net/repository/maven-public/"
     }
 }
 
-group projectGroup
-version pluginVersion
+// Set group and version from properties
+group = projectGroup
+version = pluginVersion
 
-if (spigotVersion) {
+// Load version mappings from api-versions.json
+
+if (pluginApi) {
+
+    println "Loading api mapping file..."
+    def mappingFile = file("api-versions.json")
+    if (!mappingFile.exists()) {
+        throw new GradleException("Missing api-versions.json")
+    }
+    def versionMap = new JsonSlurper().parse(mappingFile)
+
+    def artifactRepositories = versionMap[pluginApi]?.repositories
+    if (!artifactRepositories) {
+        throw new GradleException("Couldn't find repositories for the API '${pluginApi}'")
+    }
+
+    def artifactId = versionMap[pluginApi]?.artifact
+    if (!artifactId) {
+        throw new GradleException("Couldn't find artifact ID for the API '${pluginApi}'")
+    }
+
+    def artifactVersion = versionMap[pluginApi]?.versions?.get(minecraftVersion) ?: minecraftVersion
+    if (!artifactVersion) {
+        throw new GradleException("Couldn't find a version for the given API '${pluginApi} and Minecraft version: ${minecraftVersion}")
+    }
+
+    // Add dynamic repositories for artifact
+    for (repo in artifactRepositories) {
+        var repoName = pluginApi.replace(":", "-").replace(".", "-")
+        println "Adding repository '${repoName}' at '${repo}'"
+        repositories {
+            maven {
+                name = repoName
+                url = repo
+            }
+        }
+    }
+
+    // Add the artifact as a dependency
+    println "Using artifact '${artifactId}:${artifactVersion}'"
     dependencies {
-        implementation "org.spigotmc:spigot-api:${spigotVersion}"
+        compileOnly "${artifactId}:${artifactVersion}"
     }
 }
-if (paperVersion) {
-    dependencies {
-        implementation "io.papermc.paper:paper-api:${paperVersion}"
-    }
-}
-if (paperLegacyVersion) {
-    dependencies {
-        implementation "com.destroystokyo.paper:paper-api:${paperLegacyVersion}"
-    }
-}
-if (velocityVersion) {
-    dependencies {
-        implementation "com.velocitypowered:velocity-api:${velocityVersion}"
-        annotationProcessor "com.velocitypowered:velocity-api:${velocityVersion}"
-    }
-}
-if (bungeeVersion) {
-    dependencies {
-        implementation "net.md-5:bungeecord-api:${bungeeVersion}"
-    }
-}
+
 
 dependencies {
+
     implementation fileTree(dir: "libs/implementation", include: "*.jar")
     internal fileTree(dir: "libs/internal", include: "*.jar")
     compileOnly "org.jetbrains:annotations:24.0.1"
 }
 
+// JASKL dependencies
 if (jasklVersion && jasklImplementation) {
-    if (jasklShadow == "true") {
+    if (jasklShadow.toBoolean()) {
         dependencies {
             internal "io.github.almighty-satan.jaskl:jaskl-${jasklImplementation}:${jasklVersion}"
         }
@@ -110,20 +128,22 @@ if (jasklVersion && jasklImplementation) {
     }
 }
 
-if (slamsVersion && (slamsParser || slamsImplementation) ) {
-    if (slamsShadow == "true") {
+// SLAMS dependencies
+if (slamsVersion && (slamsParser || slamsImplementation)) {
+    if (slamsShadow.toBoolean()) {
         dependencies {
-            internal "io.github.almighty-satan.slams:slams-parser-${slamsParser}:${slamsVersion}"
-            internal "io.github.almighty-satan.slams:slams-${slamsImplementation}:${slamsVersion}"
+            if (slamsParser) internal "io.github.almighty-satan.slams:slams-parser-${slamsParser}:${slamsVersion}"
+            if (slamsImplementation) internal "io.github.almighty-satan.slams:slams-${slamsImplementation}:${slamsVersion}"
         }
     } else {
         dependencies {
-            implementation "io.github.almighty-satan.slams:slams-parser-${slamsParser}:${slamsVersion}"
-            implementation "io.github.almighty-satan.slams:slams-${slamsImplementation}:${slamsVersion}"
+            if (slamsParser) implementation "io.github.almighty-satan.slams:slams-parser-${slamsParser}:${slamsVersion}"
+            if (slamsImplementation) implementation "io.github.almighty-satan.slams:slams-${slamsImplementation}:${slamsVersion}"
         }
     }
 }
 
+// kLanguage dependencies
 if (klanguageVersion) {
     dependencies {
         implementation "net.kettlemc.klanguage:klanguage-core:${klanguageVersion}"
@@ -133,18 +153,17 @@ if (klanguageVersion) {
     }
 }
 
+// kCommon dependencies
 if (kcommonVersion) {
     dependencies {
         implementation "net.kettlemc:kcommon:${kcommonVersion}"
     }
 }
 
-// Use repositories from "repositories.gradle"
+// Apply external repository and dependency files if present
 if (file("repositories.gradle").exists()) {
     apply from: "repositories.gradle"
 }
-
-// Use dependencies from "dependencies.gradle"
 if (file("dependencies.gradle").exists()) {
     apply from: "dependencies.gradle"
 }
@@ -165,31 +184,6 @@ processResources {
     )
 }
 
-static JavaVersion getVersionForMajor(String version) {
-    return JavaVersion.values().find { (it.majorVersion == version) }
-}
-
-if (libby == "true") {
-
-    repositories {
-        maven {
-            name = "AlessioDP"
-            url = "https://repo.alessiodp.com/snapshots/"
-        }
-    }
-
-    dependencies {
-        implementation "com.alessiodp.libby:libby-bukkit:2.0.0-SNAPSHOT"
-    }
-
-    shadowJar {
-        // Add dependencies you want to relocate here if needed
-        dependencies {
-            include dependency("com.alessiodp.libby:libby-bukkit:2.0.0-SNAPSHOT")
-            include dependency("com.alessiodp.libby:libby-core:2.0.0-SNAPSHOT")
-        }
-
-        // Configure relocations
-        relocate 'com.alessiodp.libby', "net.kettlemc.${pluginName}.libs.com.alessiodp.libby"
-    }
+static def getVersionForMajor(String version) {
+    return JavaVersion.values().find { it.majorVersion == version }
 }
