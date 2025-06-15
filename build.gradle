@@ -12,6 +12,8 @@ configurations {
     internal
 }
 
+configurations.implementation.extendsFrom(configurations.internal)
+
 java {
     sourceCompatibility = getVersionForMajor(javaSourceVersion)
     targetCompatibility = getVersionForMajor(javaTargetVersion)
