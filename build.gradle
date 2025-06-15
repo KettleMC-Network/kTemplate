@@ -56,11 +56,18 @@ version = pluginVersion
 if (pluginApi) {
 
     println "Loading api mapping file..."
-    def mappingFile = file("api-versions.json")
-    if (!mappingFile.exists()) {
-        throw new GradleException("Missing api-versions.json")
+    def versionsUrl = 'https://raw.githubusercontent.com/KettleMC-Network/kTemplate/refs/heads/api-versions/api-versions.json'
+    def connection = new URL(versionsUrl).openConnection()
+    connection.setRequestProperty('User-Agent', 'Gradle Script')
+    def versionMap
+
+    try {
+        def inputStream = connection.getInputStream()
+        versionMap = new JsonSlurper().parse(inputStream)
+        inputStream.close()
+    } catch (Exception e) {
+        throw new GradleException("Failed to load api-versions.json from remote URL", e)
     }
-    def versionMap = new JsonSlurper().parse(mappingFile)
 
     def artifactRepositories = versionMap[pluginApi]?.repositories
     if (!artifactRepositories) {
