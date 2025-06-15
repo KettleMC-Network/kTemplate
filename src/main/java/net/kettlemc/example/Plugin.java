@@ -2,7 +2,6 @@ package net.kettlemc.example;
 
 import net.kettlemc.example.config.Configuration;
 import net.kettlemc.example.config.Messages;
-import net.kettlemc.example.loading.Loadable;
 import net.kettlemc.kcommon.bukkit.ContentManager;
 import net.kettlemc.kcommon.language.MessageManager;
 import net.kettlemc.klanguage.api.LanguageAPI;
@@ -11,22 +10,19 @@ import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public final class Plugin implements Loadable {
+public final class Plugin extends JavaPlugin {
 
     public static final LanguageAPI<Player> LANGUAGE_API = BukkitLanguageAPI.of();
     private static Plugin instance;
 
-    private final ContentManager contentManager;
-    private final JavaPlugin plugin;
+    private final ContentManager contentManager = new ContentManager(this);
     private BukkitAudiences adventure;
     private MessageManager messageManager;
 
-    public Plugin(JavaPlugin plugin) {
-        this.plugin = plugin;
-        this.contentManager = new ContentManager(plugin);
-    }
-
     public static Plugin instance() {
+        if (instance == null) {
+            throw new IllegalStateException("Plugin instance is not initialized yet!");
+        }
         return instance;
     }
 
@@ -35,23 +31,23 @@ public final class Plugin implements Loadable {
 
         instance = this;
 
-        this.plugin.getLogger().info("Hello, World!");
+        this.getLogger().info("Hello, World!");
 
         if (!Configuration.load()) {
-            this.plugin.getLogger().severe("Failed to load config!");
+            this.getLogger().severe("Failed to load config!");
         }
 
         if (!Messages.load()) {
-            this.plugin.getLogger().severe("Failed to load messages!");
+            this.getLogger().severe("Failed to load messages!");
         }
 
-        this.adventure = BukkitAudiences.create(this.plugin);
+        this.adventure = BukkitAudiences.create(this);
         this.messageManager = new MessageManager(Messages.PREFIX, LANGUAGE_API, this.adventure());
     }
 
     @Override
     public void onDisable() {
-        this.plugin.getLogger().info("Goodbye, World!");
+        this.getLogger().info("Goodbye, World!");
         Configuration.unload();
     }
 
@@ -62,8 +58,9 @@ public final class Plugin implements Loadable {
         return this.adventure;
     }
 
+    @Deprecated
     public JavaPlugin plugin() {
-        return plugin;
+        return this;
     }
 
     public ContentManager contentManager() {
