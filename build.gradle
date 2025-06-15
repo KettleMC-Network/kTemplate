@@ -5,14 +5,12 @@ import groovy.json.JsonSlurper
 
 plugins {
     id "java"
-    id "com.github.johnrengelman.shadow" version "7.0.0"
+    id "com.gradleup.shadow" version "8.3.0"
 }
 
 configurations {
     internal
 }
-
-configurations.implementation.extendsFrom(configurations.internal)
 
 java {
     sourceCompatibility = getVersionForMajor(javaSourceVersion)
@@ -29,17 +27,8 @@ java {
 // Configure shadowJar task
 shadowJar {
     configurations = [project.configurations.internal]
-
-    dependencies {
-        include { dep -> project.configurations.internal.dependencies.contains(dep) }
-    }
-
-    project.configurations.internal.dependencies.each { dep ->
-        if (dep.group && dep.name) {
-            relocate "${dep.group}.${dep.name.replace('-', '.')}",
-                    "net.kettlemc.${pluginName}.libs.${dep.group.replace('.', '_')}.${dep.name.replace('-', '_')}"
-        }
-    }
+    enableRelocation = true
+    relocationPrefix = projectGroup + ".shadow"
 }
 
 tasks.compileJava {
