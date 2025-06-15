@@ -88,6 +88,16 @@ if (pluginApi) {
         throw new GradleException("Couldn't find a version for the given API '${pluginApi} and Minecraft version: ${minecraftVersion}")
     }
 
+    def apiAnnotationProcessor = versionMap[pluginApi]?.annotationProcessor
+    if (apiAnnotationProcessor) {
+        println "Using annotation processor '${apiAnnotationProcessor}' for API '${pluginApi}'"
+        dependencies {
+            annotationProcessor "${apiAnnotationProcessor}:${artifactVersion}".toString()
+        }
+    } else {
+        println "No annotation processor found for API '${pluginApi}'"
+    }
+
     // Add dynamic repositories for artifact
     for (repo in artifactRepositories) {
         var repoName = pluginApi.replace(":", "-").replace(".", "-")

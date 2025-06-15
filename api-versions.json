@@ -195,8 +195,9 @@
   },
   "velocity": {
     "repositories": [
-      "https://nexus.velocitypowered.com/repository/maven-public/"
+      "https://repo.papermc.io/repository/maven-public/"
     ],
+    "annotationProcessor": "com.velocitypowered:velocity-api",
     "artifact": "com.velocitypowered:velocity-api",
     "versions": {
     }
